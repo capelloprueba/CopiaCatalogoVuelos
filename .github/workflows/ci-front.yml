@@ -1,12 +1,12 @@
-name: Front CI (PR & Push)
+name: Front CI (main only)
 
 on:
-  pull_request:
-    branches: [ preprod, main ]
+  push:
+    branches: [ main ]
     paths-ignore:
       - "**/*.md"
-  push:
-    branches: [ preprod, main ]
+  pull_request:
+    branches: [ main ]
     paths-ignore:
       - "**/*.md"
 
@@ -14,14 +14,15 @@ permissions:
   contents: read
   pull-requests: read
 
-# (Opcional) cancela runs anteriores en la misma rama
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   ci:
+    name: Build + Test
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,7 +40,7 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - name: Install deps
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Lint
@@ -54,9 +55,3 @@ jobs:
         with:
           name: coverage
           path: coverage/
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
