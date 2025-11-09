@@ -1,32 +1,66 @@
-import { AltaVuelo } from "./pages/AltaVuelo";
+iimport { AltaVuelo } from "./pages/AltaVuelo";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DetalleVuelo from "./pages/DetalleVuelo";
+import { useDispatch } from "react-redux";
+import { authCheckComplete, setAuthStatus } from "./redux/authSlice";
+import { useEffect } from "react";
+import { ProtectedRoutes } from "./components/ProtectedRoutes";
+import { ProtectedRoutesAdmin } from "./components/ProtectedRoutesAdmin";
 
-// ✅ Eliminado redux/auth y ProtectedRoutes
-// ✅ Todas las rutas ahora son públicas
-// ✅ Home es pantalla inicial
+
+// Función para verificar si el usuario está logueado.
+const checkAuthStatus = (dispatch) => {
+  const token = localStorage.getItem('authToken');
+  const user = JSON.parse(localStorage.getItem('user'))
+  if (token) {
+    dispatch(setAuthStatus({ token, user }))
+  } else {
+    dispatch(authCheckComplete());
+  }
+}
 
 export default function App() {
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    checkAuthStatus(dispatch)
+  }, [dispatch])
+
   return (
     <BrowserRouter>
+
       <Routes>
+        { /* Rutas publicas */}
+        <Route
+          path="/"
+          element={<Login />}
+        />
+        <Route
+          path="/signup"
+          element={<Signup />}
+        />
 
-        {/* Primera pantalla -> HOME */}
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/home"
+          element={<Home />}
+        />
 
-        {/* Si necesitás entrar igual a login / signup para pruebas */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/vuelos/:id"
+          element={<DetalleVuelo />}
+        />
 
-        {/* Rutas que antes eran protegidas */}
-        <Route path="/vuelos/:id" element={<DetalleVuelo />} />
-        <Route path="/vuelos/nuevo" element={<AltaVuelo />} />
+          <Route
+            path="/vuelos/nuevo"
+            element={<AltaVuelo />}
+          />
 
       </Routes>
+
     </BrowserRouter>
   );
 }
-
