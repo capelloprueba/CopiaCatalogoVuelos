@@ -1,26 +1,25 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://backendcatalogo-production.up.railway.app';
+const API_BASE_URL = 'https://copiabackendcatalogo-production.up.railway.app';
 const API_KEY = 'dapps2-2025';
 
-// Create axios instance with default config
+// Cliente axios con configuración base
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'x-api-key': API_KEY,
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   },
+  // (opcional) timeout para no colgar la UI
+  timeout: 15000,
 });
 
 export const api = {
-  // Fetch all flights
+  // Obtener todos los vuelos
   async getFlights() {
     try {
       const response = await apiClient.get('/vuelos/search', {
-        params: {
-          page: 0,
-          size: 100
-        }
+        params: { page: 0, size: 100 },
       });
       console.log(response.data.content);
       return response.data.content;
@@ -30,13 +29,12 @@ export const api = {
     }
   },
 
-  // Change flight status
+  // Cambiar estado de un vuelo
   async changeFlightStatus(id, status) {
     console.log('Status', status);
-    
     try {
       const response = await apiClient.put(`/vuelos/${id}`, {
-        estadoVuelo: status
+        estadoVuelo: status,
       });
       return response.data;
     } catch (error) {
@@ -44,28 +42,29 @@ export const api = {
       throw error;
     }
   },
-  // Change flight status
+
+  // Cambiar fechas de un vuelo
   async changeFlightDate(id, nuevaAterrizaje, nuevoDespegue) {
     try {
       const response = await apiClient.put(`/vuelos/${id}`, {
         aterrizajeLocal: nuevaAterrizaje,
-        despegue: nuevoDespegue
+        despegue: nuevoDespegue,
       });
       return response.data;
     } catch (error) {
-      console.error('Error changing flight status:', error);
+      console.error('Error changing flight date:', error);
       throw error;
     }
   },
-  // Cear nuevo vuelo
+
+  // Crear nuevo vuelo
   async createFlight(data) {
     try {
-      const response = await apiClient.post(`/vuelos`, data);
+      const response = await apiClient.post('/vuelos', data);
       return response.data;
     } catch (error) {
       console.error('Error creating flight:', error);
       throw error;
     }
-  }
-
+  },
 };
