@@ -44,20 +44,29 @@ export default function App() {
           element={<Signup />}
         />
 
-        <Route
-          path="/home"
-          element={<Home />}
-        />
 
-        <Route
-          path="/vuelos/:id"
-          element={<DetalleVuelo />}
-        />
+        { /* Rutas protegidas Normales */}
+        <Route element={<ProtectedRoutes />}>
+          <Route
+            path="/home"
+            element={<Home />}
+          />
 
+          <Route
+            path="/vuelos/:id"
+            element={<DetalleVuelo />}
+          />
+        </Route>
+
+        { /* Rutas protegidas Normales */}
+
+        <Route element={<ProtectedRoutesAdmin />}>
           <Route
             path="/vuelos/nuevo"
             element={<AltaVuelo />}
           />
+        </Route>
+
 
       </Routes>
 
